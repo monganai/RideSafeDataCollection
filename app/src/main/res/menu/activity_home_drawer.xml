@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_home"
+            android:icon="@drawable/ic_menu_send"
+
+            android:title="Home"
+            tools:icon="@android:drawable/star_big_on" />
+
+    <item
+        android:id="@+id/nav_Profile"
+        android:icon="@drawable/ic_menu_send"
+
+        android:title="My Profile" />
+    <item
+        android:id="@+id/nav_contact"
+        android:icon="@drawable/ic_menu_send"
+
+        android:title="Emergency Contact" />
+
+    <item
+        android:id="@+id/nav_tools"
+        android:icon="@drawable/ic_menu_manage"
+        android:title="Tools" />
+</group>
+
+
+    <group android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/app_exit"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="Exit Application"
+            tools:icon="@android:drawable/ic_delete" />
+    </group>
+
+
+
+</menu>
