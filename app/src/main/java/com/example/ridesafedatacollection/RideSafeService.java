@@ -15,40 +15,23 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-
-
 import java.math.BigDecimal;
-import java.util.ArrayList;
+import static com.example.ridesafedatacollection.notificationConfig.CHANNEL_ID;
 
+public class RideSafeService extends Service implements  SensorEventListener, GPSUpdate {
 
-
-
-public class RideSafeService extends Service implements SensorEventListener, GPSUpdate {
-
-
-    public static final String CHANNEL_ID = "RideSafeServiceChannel";
 
     private Sensor myAccelerometer, myGyroscope;
     private SensorManager SM;
-    double X, Y, Z;
+    Notification notification;
+    DatabaseHelper mDatabaseHelper;
     int sensorType;
     private GPSConfig gpsManager = null;
     private double speed = 0.0;
-    double currentSpeed, kmphSpeed;
-    boolean SpeedAquired;
-    boolean GAquired;
-    boolean RAquired;
-    double SPEEDPREV;
-    double SPEEDCURR;
-    double SPEEDDIFF;
-    double nullNum = 9999;
-    double ACCELEROMETER;
-    double GYROX, GYROY, GYROZ;
-
-
     LocationManager locationManager;
-    Notification notification;
-    DatabaseHelper mDatabaseHelper;
+    boolean SpeedAquired, GAquired, RAquired;
+    double GYROX, GYROY, GYROZ, ACCELEROMETER, SPEEDPREV, SPEEDCURR, SPEEDDIFF, currentSpeed, X, Y, Z;
+    double nullNum = 9999;
 
 
 
@@ -105,17 +88,26 @@ public class RideSafeService extends Service implements SensorEventListener, GPS
             Y = event.values[1];
             Z = event.values[2];
             ACCELEROMETER = Math.sqrt(X * X + Y * Y + Z * Z) - 9.807;
-            Log.d("rs", " G-force is : " + Double.toString(ACCELEROMETER));
+            //Log.d("rs", " G-force is : " + Double.toString(ACCELEROMETER));
             GAquired = true;
 
-
+            if(RAquired) {
+                GAquired = false;
+                RAquired = false;
+               AddData();
+            }
         } else if (sensorType != 1 && !RAquired) {
 
             GYROX = event.values[0];
             GYROY = event.values[1];
             GYROZ = event.values[2];
-            Log.d("rs", " Rotation x : " + GYROX + " y : " + GYROY + " z : " + GYROZ);
+           // Log.d("rs", " Rotation x : " + GYROX + " y : " + GYROY + " z : " + GYROZ);
             RAquired = true;
+            if(GAquired){
+                GAquired = false;
+                RAquired = false;
+                AddData();
+            }
 
         }
     }
@@ -149,10 +141,7 @@ public class RideSafeService extends Service implements SensorEventListener, GPS
 
 
     //-------------------------------------------------------------------------------------------
-    //Database
-    public void AddData(String newEntry) {
-        mDatabaseHelper.addData(newEntry, "sensor_values", "value");
-    }
+
 
 //----------------------------------------------------------------------------------------------------
 
@@ -170,16 +159,11 @@ public class RideSafeService extends Service implements SensorEventListener, GPS
 
     @Override
     public void onGPSUpdate(Location location) {
-        GAquired = false;
-        RAquired = false;
-        SpeedAquired = true;
+
         speed = location.getSpeed();
         currentSpeed = round(speed, 3, BigDecimal.ROUND_HALF_UP);
         SPEEDCURR = round((currentSpeed * 3.6), 3, BigDecimal.ROUND_HALF_UP);
-        Log.d("rs", "Speed : " + SPEEDCURR);
-        SpeedAquired = false;
-        AddData();
-
+      //  Log.d("rs", "Speed : " + SPEEDCURR);
 
     }
 
@@ -194,8 +178,6 @@ public class RideSafeService extends Service implements SensorEventListener, GPS
     public void AddData() {
 
         if (ACCELEROMETER != nullNum && GYROX != nullNum && GYROY != nullNum && GYROZ != nullNum && SPEEDCURR != nullNum) {
-
-
             SPEEDDIFF = diff(SPEEDCURR,SPEEDPREV);
 
 
@@ -208,13 +190,18 @@ public class RideSafeService extends Service implements SensorEventListener, GPS
 
             mDatabaseHelper.addRow(values, "sensor_values");
 
+            Log.d("Gforce", " G-force is : " + Double.toString(ACCELEROMETER));
+            Log.d("GX", " Gx: " + Double.toString(GYROX));
+            Log.d("GY", " Gy: " + Double.toString(GYROY));
+            Log.d("GZ", " Gz: " + Double.toString(GYROZ));
+            Log.d("Speed Change", " speed diff: " + Double.toString(SPEEDDIFF));
+
 
             ACCELEROMETER = nullNum;
             GYROX = nullNum;
             GYROY = nullNum;
             GYROZ = nullNum;
             SPEEDPREV = SPEEDCURR;
-            SPEEDCURR = nullNum;
             SPEEDDIFF = nullNum;
 
 
