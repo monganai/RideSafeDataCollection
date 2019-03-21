@@ -27,7 +27,7 @@ public class main_Home extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     boolean RUNNING = false;
-    Button toggleBTN;
+    Button StartService,StopService;
     private GPSConfig gpsManager = null;
     boolean isGPSon;
     LocationManager locationManager;
@@ -48,8 +48,9 @@ public class main_Home extends AppCompatActivity
         toggle.syncState();
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        toggleBTN = findViewById(R.id.startServiceBtn);
-        toggleBTN.setText("click to Start");
+        StartService = findViewById(R.id.startServiceBtn);
+        StopService = findViewById(R.id.stopServiceBtn);
+
         mDatabaseHelper = new DatabaseHelper(this);
 
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
@@ -67,15 +68,12 @@ public class main_Home extends AppCompatActivity
     }
 
     public void startService(View v) {
-        if (!RUNNING) {
-
 
             locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
             gpsManager = new GPSConfig(main_Home.this);
             isGPSon = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 
             if (isGPSon) {
-                toggleBTN.setText(getString(R.string.running));
                 String init = "running";
                 Intent serviceIntent = new Intent(this, RideSafeService.class);
                 serviceIntent.putExtra("inputExtra", init);
@@ -85,20 +83,15 @@ public class main_Home extends AppCompatActivity
             } else {
                 showSettingsAlert();
             }
-        } else {
-            stopService(v);
-            RUNNING = false;
-            toggleBTN.setText("click to start");
-
-        }
     }
 
     public void stopService(View v) {
-        ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 101);
+
 
         Intent serviceIntent = new Intent(this, RideSafeService.class);
         stopService(serviceIntent);
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 101);
 
     }
 
@@ -140,14 +133,9 @@ public class main_Home extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_Profile) {
-            // Handle the camera action
 
-        } else if (id == R.id.nav_contact) {
 
-        } else if (id == R.id.nav_tools) {
-
-        } else if (id == R.id.app_exit) {
+         if (id == R.id.app_exit) {
 
             stopService(new Intent(this, RideSafeService.class));
             finish();

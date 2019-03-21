@@ -1,14 +1,17 @@
 package com.example.ridesafedatacollection;
 
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -27,12 +30,18 @@ public class main_Settings extends AppCompatActivity {
     Button deletebtn;
     Button exportbtn;
     DatabaseHelper mDatabaseHelper;
+    String FILENAME;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main__settings);
         mDatabaseHelper = new DatabaseHelper(this);
+
+
+
+
+
         exportinit();
         deleteinit();
 
@@ -75,7 +84,7 @@ public class main_Settings extends AppCompatActivity {
         File data = Environment.getDataDirectory();
         FileChannel source;
         FileChannel destination;
-        String currentDBPath = "/data/" + "com.example.nanou.ridesafe" + "/databases/" + mDatabaseHelper.getDBname();
+        String currentDBPath = "/data/" + "com.example.ridesafedatacollection" + "/databases/" + mDatabaseHelper.getDBname();
         File currentDB = new File(data, currentDBPath);
         File backupDB = new File(sd, filename);
         try {
@@ -98,8 +107,6 @@ public class main_Settings extends AppCompatActivity {
 
         File sd = Environment.getExternalStorageDirectory();
         File backupDB = new File(sd, filename);
-
-
         Uri path = Uri.fromFile(backupDB);
         Intent emailIntent = new Intent(Intent.ACTION_SEND);
 // set the type to 'email'
@@ -109,7 +116,7 @@ public class main_Settings extends AppCompatActivity {
 // the attachment
         emailIntent.putExtra(Intent.EXTRA_STREAM, path);
 // the mail subject
-        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "RideSafe Data");
         startActivityForResult(Intent.createChooser(emailIntent, "Send email..."), 101);
 
 
@@ -118,6 +125,7 @@ public class main_Settings extends AppCompatActivity {
 
     public void deleteDB() {
         mDatabaseHelper.deleteData("sensor_values");
+        deleteDBFile(FILENAME);
         Toast.makeText(this, "DB Deleted", Toast.LENGTH_LONG).show();
     }
 
@@ -162,7 +170,7 @@ public class main_Settings extends AppCompatActivity {
                 mDatabaseHelper.addRow(values, "sensor_values");
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy-hh-mm-ss");
                 String fname = simpleDateFormat.format(new Date());
-                String FILENAME = mDatabaseHelper.getDBname() + "_" + fname + ".db";
+                FILENAME = mDatabaseHelper.getDBname() + "_" + fname + ".db";
                 exportDB(FILENAME);
                 dialog.cancel();
 
@@ -170,6 +178,16 @@ public class main_Settings extends AppCompatActivity {
         });
 // Showing Alert Message
         alertDialog.show();
+    }
+
+
+
+    public void deleteDBFile(String filename){
+
+        File sd = Environment.getExternalStorageDirectory();
+        File toDelete = new File(sd, FILENAME);
+        boolean deleted = toDelete.delete();
+        Log.d("delete", "file deleted :" + deleted);
     }
 
 
