@@ -184,10 +184,16 @@ public class main_Settings extends AppCompatActivity {
 
     public void deleteDBFile(String filename){
 
-        File sd = Environment.getExternalStorageDirectory();
-        File toDelete = new File(sd, FILENAME);
-        boolean deleted = toDelete.delete();
-        Log.d("delete", "file deleted :" + deleted);
+        try {
+
+            File sd = Environment.getExternalStorageDirectory();
+            File toDelete = new File(sd, FILENAME);
+            boolean deleted = toDelete.delete();
+            Log.d("delete", "file deleted :" + deleted);
+
+        } catch(NullPointerException e){
+            Log.d("delete", "no db file found");
+        }
     }
 
 

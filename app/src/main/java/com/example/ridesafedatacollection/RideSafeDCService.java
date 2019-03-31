@@ -18,7 +18,7 @@ import android.util.Log;
 import java.math.BigDecimal;
 import static com.example.ridesafedatacollection.notificationConfig.CHANNEL_ID;
 
-public class RideSafeService extends Service implements  SensorEventListener, GPSUpdate {
+public class RideSafeDCService extends Service implements  SensorEventListener, GPSUpdate {
 
 
     private Sensor myAccelerometer, myGyroscope;
@@ -51,7 +51,7 @@ public class RideSafeService extends Service implements  SensorEventListener, GP
         SM.registerListener(this, myAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
         SM.registerListener(this, myGyroscope, SensorManager.SENSOR_DELAY_NORMAL);
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        gpsManager = new GPSConfig(RideSafeService.this);
+        gpsManager = new GPSConfig(RideSafeDCService.this);
         gpsManager.startListening(getApplicationContext());
         gpsManager.setGPSCallback(this);
         SPEEDPREV = 0.0;
@@ -88,6 +88,7 @@ public class RideSafeService extends Service implements  SensorEventListener, GP
             Y = event.values[1];
             Z = event.values[2];
             ACCELEROMETER = Math.sqrt(X * X + Y * Y + Z * Z) - 9.807;
+            ACCELEROMETER = (double)Math.round(ACCELEROMETER * 100d)/100d;
             //Log.d("rs", " G-force is : " + Double.toString(ACCELEROMETER));
             GAquired = true;
 
@@ -98,9 +99,11 @@ public class RideSafeService extends Service implements  SensorEventListener, GP
             }
         } else if (sensorType != 1 && !RAquired) {
 
-            GYROX = event.values[0];
-            GYROY = event.values[1];
-            GYROZ = event.values[2];
+            GYROX = (double)Math.round(event.values[0] * 100d)/100d;
+            GYROY = (double)Math.round(event.values[1] * 100d)/100d;
+            GYROZ = (double)Math.round(event.values[2] * 100d)/100d;
+
+
            // Log.d("rs", " Rotation x : " + GYROX + " y : " + GYROY + " z : " + GYROZ);
             RAquired = true;
             if(GAquired){
@@ -150,7 +153,7 @@ public class RideSafeService extends Service implements  SensorEventListener, GP
 
     public void getCurrentSpeed() {
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        gpsManager = new GPSConfig(RideSafeService.this);
+        gpsManager = new GPSConfig(RideSafeDCService.this);
         gpsManager.startListening(getApplicationContext());
         gpsManager.setGPSCallback(this);
 
@@ -178,7 +181,10 @@ public class RideSafeService extends Service implements  SensorEventListener, GP
     public void AddData() {
 
         if (ACCELEROMETER != nullNum && GYROX != nullNum && GYROY != nullNum && GYROZ != nullNum && SPEEDCURR != nullNum) {
-            SPEEDDIFF = diff(SPEEDCURR,SPEEDPREV);
+           // SPEEDDIFF = diff(SPEEDCURR,SPEEDPREV);
+
+            double averageGyro = (GYROX + GYROY + GYROZ)/ 3;
+            averageGyro = (double)Math.round(averageGyro * 1d)/1d;
 
 
             ContentValues values = new ContentValues();
@@ -186,7 +192,7 @@ public class RideSafeService extends Service implements  SensorEventListener, GP
             values.put("gx", GYROX);
             values.put("gy", GYROY);
             values.put("gz", GYROZ);
-            values.put("speed", SPEEDDIFF);
+            values.put("speed", SPEEDCURR);
 
             mDatabaseHelper.addRow(values, "sensor_values");
 
@@ -194,7 +200,7 @@ public class RideSafeService extends Service implements  SensorEventListener, GP
             Log.d("GX", " Gx: " + Double.toString(GYROX));
             Log.d("GY", " Gy: " + Double.toString(GYROY));
             Log.d("GZ", " Gz: " + Double.toString(GYROZ));
-            Log.d("Speed Change", " speed diff: " + Double.toString(SPEEDDIFF));
+            Log.d("GZ", " Gave: " + Double.toString(averageGyro));       Log.d("Speed Change", " speed diff: " + Double.toString(SPEEDCURR));
 
 
             ACCELEROMETER = nullNum;

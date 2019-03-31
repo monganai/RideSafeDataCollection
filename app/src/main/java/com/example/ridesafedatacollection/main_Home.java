@@ -75,7 +75,7 @@ public class main_Home extends AppCompatActivity
 
             if (isGPSon) {
                 String init = "running";
-                Intent serviceIntent = new Intent(this, RideSafeService.class);
+                Intent serviceIntent = new Intent(this, RideSafeDCService.class);
                 serviceIntent.putExtra("inputExtra", init);
                 startService(serviceIntent);
                 RUNNING = true;
@@ -88,7 +88,7 @@ public class main_Home extends AppCompatActivity
     public void stopService(View v) {
 
 
-        Intent serviceIntent = new Intent(this, RideSafeService.class);
+        Intent serviceIntent = new Intent(this, RideSafeDCService.class);
         stopService(serviceIntent);
         ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 101);
@@ -137,7 +137,7 @@ public class main_Home extends AppCompatActivity
 
          if (id == R.id.app_exit) {
 
-            stopService(new Intent(this, RideSafeService.class));
+            stopService(new Intent(this, RideSafeDCService.class));
             finish();
             moveTaskToBack(true);
         }
