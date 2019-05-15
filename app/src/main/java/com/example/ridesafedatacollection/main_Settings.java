@@ -1,21 +1,18 @@
 package com.example.ridesafedatacollection;
 
 
-import android.Manifest;
 import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Environment;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -37,15 +34,8 @@ public class main_Settings extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main__settings);
         mDatabaseHelper = new DatabaseHelper(this);
-
-
-
-
-
         exportinit();
         deleteinit();
-
-
     }
 
 
@@ -58,8 +48,6 @@ public class main_Settings extends AppCompatActivity {
 
             }
         });
-
-
     }
 
 
@@ -70,8 +58,6 @@ public class main_Settings extends AppCompatActivity {
             public void onClick(View v) {
 
                 showCrashQ();
-
-
             }
         });
 
@@ -103,23 +89,16 @@ public class main_Settings extends AppCompatActivity {
 
 
     public void emailDatabase(String filename) {
-
-
         File sd = Environment.getExternalStorageDirectory();
         File backupDB = new File(sd, filename);
         Uri path = Uri.fromFile(backupDB);
         Intent emailIntent = new Intent(Intent.ACTION_SEND);
-// set the type to 'email'
         emailIntent.setType("vnd.android.cursor.dir/email");
         String to[] = {"monganai@tcd.ie"};
         emailIntent.putExtra(Intent.EXTRA_EMAIL, to);
-// the attachment
         emailIntent.putExtra(Intent.EXTRA_STREAM, path);
-// the mail subject
         emailIntent.putExtra(Intent.EXTRA_SUBJECT, "RideSafe Data");
         startActivityForResult(Intent.createChooser(emailIntent, "Send email..."), 101);
-
-
     }
 
 
@@ -132,15 +111,10 @@ public class main_Settings extends AppCompatActivity {
 
     public void showCrashQ() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(main_Settings.this);
-// Setting Dialog Title
         alertDialog.setTitle("Crash Question");
-// Setting Dialog Message
         alertDialog.setMessage("while using Ridesafe, did you have any crashes/falls?");
-// On pressing Settings button
         alertDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-
-
                 //add a line containing  1,1,1,1,1,1
                 ContentValues values = new ContentValues();
                 values.put("gforce", 1);
@@ -157,7 +131,6 @@ public class main_Settings extends AppCompatActivity {
 
             }
         });
-// on pressing cancel button
         alertDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 //add a line containing  0,0,0,0,0,0,0
@@ -179,9 +152,6 @@ public class main_Settings extends AppCompatActivity {
 // Showing Alert Message
         alertDialog.show();
     }
-
-
-
     public void deleteDBFile(String filename){
 
         try {

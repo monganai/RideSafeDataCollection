@@ -18,15 +18,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String GY = "gy";
     private static final String GZ = "gz";
     private static final String SPEED = "speed";
-
-
-
-
     private static final String KEY_ID = "id";
-
-
-
-
 
 
     public DatabaseHelper(Context context) {
@@ -95,20 +87,5 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

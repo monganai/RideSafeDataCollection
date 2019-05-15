@@ -43,11 +43,9 @@ public class RideSafeDCService extends Service implements  SensorEventListener, 
         myAccelerometer = SM.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         myGyroscope = SM.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
         mDatabaseHelper = new DatabaseHelper(this);
-
         SpeedAquired = false;
         GAquired = false;
         RAquired = false;
-
         SM.registerListener(this, myAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
         SM.registerListener(this, myGyroscope, SensorManager.SENSOR_DELAY_NORMAL);
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
@@ -89,7 +87,6 @@ public class RideSafeDCService extends Service implements  SensorEventListener, 
             Z = event.values[2];
             ACCELEROMETER = Math.sqrt(X * X + Y * Y + Z * Z) - 9.807;
             ACCELEROMETER = (double)Math.round(ACCELEROMETER * 100d)/100d;
-            //Log.d("rs", " G-force is : " + Double.toString(ACCELEROMETER));
             GAquired = true;
 
             if(RAquired) {
@@ -103,8 +100,6 @@ public class RideSafeDCService extends Service implements  SensorEventListener, 
             GYROY = (double)Math.round(event.values[1] * 100d)/100d;
             GYROZ = (double)Math.round(event.values[2] * 100d)/100d;
 
-
-           // Log.d("rs", " Rotation x : " + GYROX + " y : " + GYROY + " z : " + GYROZ);
             RAquired = true;
             if(GAquired){
                 GAquired = false;
@@ -114,7 +109,6 @@ public class RideSafeDCService extends Service implements  SensorEventListener, 
 
         }
     }
-
 
     @Override  // sensors -- unused
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
@@ -166,8 +160,6 @@ public class RideSafeDCService extends Service implements  SensorEventListener, 
         speed = location.getSpeed();
         currentSpeed = round(speed, 3, BigDecimal.ROUND_HALF_UP);
         SPEEDCURR = round((currentSpeed * 3.6), 3, BigDecimal.ROUND_HALF_UP);
-      //  Log.d("rs", "Speed : " + SPEEDCURR);
-
     }
 
 
@@ -195,29 +187,16 @@ public class RideSafeDCService extends Service implements  SensorEventListener, 
             values.put("speed", SPEEDCURR);
 
             mDatabaseHelper.addRow(values, "sensor_values");
-
-            Log.d("Gforce", " G-force is : " + Double.toString(ACCELEROMETER));
-            Log.d("GX", " Gx: " + Double.toString(GYROX));
-            Log.d("GY", " Gy: " + Double.toString(GYROY));
-            Log.d("GZ", " Gz: " + Double.toString(GYROZ));
-            Log.d("GZ", " Gave: " + Double.toString(averageGyro));       Log.d("Speed Change", " speed diff: " + Double.toString(SPEEDCURR));
-
-
             ACCELEROMETER = nullNum;
             GYROX = nullNum;
             GYROY = nullNum;
             GYROZ = nullNum;
             SPEEDPREV = SPEEDCURR;
             SPEEDDIFF = nullNum;
-
-
-
-
         }
 
 
     }
-
 
 
     public double diff(double current, double previous){
