@@ -9,3 +9,11 @@ Data was used to train the model used in "RideSafe MTB"   https://play.google.co
 
 app-debug.apk is all you need to get the app installed, download the file, copy to android device and install. 
 Note-allowing apps from untrusted sources will need to be enabled (you will get a prompt)  All the code is here so a look in the main service class will show that only sensor data is collected.
+
+#Sample data and Example Graph
+
+![Screenshot](data.png)
+![Screenshot](graph.png)
+
+
+
